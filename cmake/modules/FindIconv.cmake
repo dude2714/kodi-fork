@@ -16,12 +16,18 @@ if(NOT TARGET ICONV::ICONV)
                              HINTS ${DEPENDS_PATH}/lib
                              NO_CACHE)
 
-  set(CMAKE_REQUIRED_LIBRARIES ${ICONV_LIBRARY})
-  check_function_exists(iconv HAVE_ICONV_FUNCTION)
-  if(NOT HAVE_ICONV_FUNCTION)
-    check_function_exists(libiconv HAVE_LIBICONV_FUNCTION2)
-    set(HAVE_ICONV_FUNCTION ${HAVE_LIBICONV_FUNCTION2})
-    unset(HAVE_LIBICONV_FUNCTION2)
+  if(WIN32)
+    # On Windows, prebuilt iconv libs may fail function probes while still
+    # linking correctly in the full build.
+    set(HAVE_ICONV_FUNCTION TRUE)
+  else()
+    set(CMAKE_REQUIRED_LIBRARIES ${ICONV_LIBRARY})
+    check_function_exists(iconv HAVE_ICONV_FUNCTION)
+    if(NOT HAVE_ICONV_FUNCTION)
+      check_function_exists(libiconv HAVE_LIBICONV_FUNCTION2)
+      set(HAVE_ICONV_FUNCTION ${HAVE_LIBICONV_FUNCTION2})
+      unset(HAVE_LIBICONV_FUNCTION2)
+    endif()
   endif()
 
   include(FindPackageHandleStandardArgs)

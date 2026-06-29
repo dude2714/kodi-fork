@@ -45,6 +45,16 @@ SET PreferredToolArchitecture=x64
 SET buildconfig=Release
 set WORKSPACE=%base_dir%\kodi-build.%TARGET_PLATFORM%
 
+IF "%cmakeProps%"=="" (
+  SET cmakeProps=-DENABLE_INTERNAL_FFMPEG=ON -DENABLE_CEC=OFF -DENABLE_DAV1D=OFF
+) ELSE (
+  SET cmakeProps=%cmakeProps% -DENABLE_INTERNAL_FFMPEG=ON -DENABLE_CEC=OFF -DENABLE_DAV1D=OFF
+)
+
+IF EXIST "C:\PROGRA~1\Git\bin\bash.exe" (
+  SET cmakeProps=%cmakeProps% -DBASH_COMMAND=C:/PROGRA~1/Git/bin/bash.exe
+)
+
 
   :: sets the BRANCH env var
   FOR /f %%a IN ('getbranch.bat') DO SET BRANCH=%%a

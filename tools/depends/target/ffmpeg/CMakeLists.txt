@@ -121,7 +121,7 @@ if(CPU MATCHES x86 OR CPU MATCHES x86_64)
   list(APPEND ffmpeg_conf --x86asmexe=${NASM_EXECUTABLE})
 endif()
 
-if(ENABLE_DAV1D)
+if(ENABLE_DAV1D AND NOT CORE_SYSTEM_NAME STREQUAL windows)
   list(APPEND ffmpeg_conf --enable-libdav1d)
   set(pkgconf_path "PKG_CONFIG_PATH=${PKG_CONFIG_PATH}")
 else()
@@ -148,9 +148,15 @@ if(CMAKE_GENERATOR STREQUAL Ninja)
 endif()
 
 include(ExternalProject)
+if(CORE_SYSTEM_NAME STREQUAL windows)
+  set(FFMPEG_CONFIGURE_COMMAND ${BASH_COMMAND} <SOURCE_DIR>/configure)
+else()
+  set(FFMPEG_CONFIGURE_COMMAND <SOURCE_DIR>/configure)
+endif()
+
 externalproject_add(ffmpeg
                     SOURCE_DIR ${CMAKE_SOURCE_DIR}
-                    CONFIGURE_COMMAND ${pkgconf} ${pkgconf_path} <SOURCE_DIR>/configure
+                    CONFIGURE_COMMAND ${pkgconf} ${pkgconf_path} ${FFMPEG_CONFIGURE_COMMAND}
                       --prefix=${CMAKE_INSTALL_PREFIX}
                       --extra-version="kodi-${FFMPEG_VER}"
                       ${ffmpeg_conf}
